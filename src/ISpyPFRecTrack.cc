@@ -79,7 +79,7 @@ void ISpyPFRecTrack::analyze(const edm::Event& event, const edm::EventSetup& eve
       rt[PT] = (*rectrack).trackRef()->pt();
       rt[PHI] = (*rectrack).trackRef()->phi();
       rt[ETA] = (*rectrack).trackRef()->eta();
-      rt[CHARGE] = (*rectrack).charge();
+      rt[CHARGE] = static_cast<int>((*rectrack).charge());
 
       unsigned int algoType = (*rectrack).algoType();
       

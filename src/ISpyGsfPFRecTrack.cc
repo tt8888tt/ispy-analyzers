@@ -83,7 +83,7 @@ void ISpyGsfPFRecTrack::analyze(const edm::Event& event, const edm::EventSetup& 
       gsft[PHI] = closestApproach.momentum().eta();
       gsft[ETA] = closestApproach.momentum().phi();
 
-      gsft[CHARGE] = (*t).charge();
+      gsft[CHARGE] = static_cast<int>((*t).charge());
 
       const std::vector<reco::PFTrajectoryPoint>& points = (*t).trajectoryPoints();
 
