@@ -1,9 +1,10 @@
 #ifndef ANALYZER_ISPY_SERVICE_H
 # define ANALYZER_ISPY_SERVICE_H
 
-# include "ISpy/Services/interface/IgNet.h"
 # include <deque>
 # include <string>
+
+#include "classlib/utils/Time.h"
 
 namespace lat 
 {
@@ -13,7 +14,6 @@ namespace lat
 }
 
 class IgDataStorage;
-class ISpyNetProducer;
 
 namespace edm {
   class ActivityRegistry;
@@ -45,7 +45,6 @@ namespace edm {
       void		registry (void);
       void		produceEvent (const edm::Event & event, const std::string & name, const char *data, long int length);
       std::string	tempFileName (const std::string & name);
-      bool		isOnline (void) { return online_; }
       void		finalize (const std::string & name);
 	    
       const std::string outputFileName_;
@@ -62,10 +61,6 @@ namespace edm {
       int		currentRun_;	    
       int		currentEvent_;
       lat::Time		nextTime_;
-      
-      std::string	outputHost_;
-      unsigned int	outputPort_;
-      bool		online_;	    
       bool		debug_;
 	    
       lat::ZipArchive 	*archives_[2];
@@ -74,9 +69,6 @@ namespace edm {
       IgDataStorage 	*storages_[2];
       std::string	currentFile_[2];	    
       unsigned int	bufferSize_;
-      
-      ISpyNetProducer	*netProducer_;
-      std::deque<std::string> netEvents_;
     };
   }
 }

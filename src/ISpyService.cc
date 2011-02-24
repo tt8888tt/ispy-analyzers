@@ -1,5 +1,4 @@
 #include "ISpy/Analyzers/interface/ISpyService.h"
-#include "ISpy/Analyzers/interface/ISpyNetProducer.h"
 #include "ISpy/Services/interface/IgCollection.h"
 
 #include "DataFormats/Provenance/interface/EventID.h"
@@ -40,12 +39,8 @@ ISpyService::ISpyService (const ParameterSet& iPSet, ActivityRegistry& iRegistry
     eventCounter_ (0),
     fileCounter_ (1),
     currentRun_ (-1),
-    outputHost_(iPSet.getUntrackedParameter<std::string>( "outputHost", std::string("localhost"))),
-    outputPort_(iPSet.getUntrackedParameter<unsigned int>( "outputPort", 9000)),
-    online_(iPSet.getUntrackedParameter<bool>( "online", false)),
     debug_(iPSet.getUntrackedParameter<bool>( "debug", false)),
-    bufferSize_(iPSet.getUntrackedParameter<unsigned int>( "bufferSize", 10)),
-    netProducer_(0)
+    bufferSize_(iPSet.getUntrackedParameter<unsigned int>( "bufferSize", 10))
 {
   archives_[0] = archives_[1] = 0;
 
@@ -60,13 +55,7 @@ ISpyService::ISpyService (const ParameterSet& iPSet, ActivityRegistry& iRegistry
 
 void
 ISpyService::init (void)
-{
-  if (isOnline ())
-  {	
-    netProducer_ = new ISpyNetProducer (debug_, outputPort_);
-    netProducer_->start ();
-  }
-}
+{}
 
 void
 ISpyService::postBeginJob (void)
@@ -128,18 +117,6 @@ ISpyService::postEndJob (void)
       finalize (currentFile_[1]);
     }
   }
-  
-  if (netProducer_)
-  {	
-    netProducer_->lock ();
-    netEvents_.clear ();
-    netProducer_->unlock ();
-    netProducer_->sendLocalChanges ();	
-    interrupt (9);
-    netProducer_->shutdown ();
-	
-    delete netProducer_;	
-  }
 }
 
 void
@@ -189,15 +166,7 @@ ISpyService::postEventProcessing (const edm::Event& event, const edm::EventSetup
   {
     std::stringstream oss;
     oss << *storages_[0];
-    if (isOnline ())
-    {
-      ASSERT (netProducer_);	
 
-      std::stringstream noss;
-      noss << "Events/Run_" << event.run () << "/Event_" << event.id ().event ();
-
-      produceEvent (event, noss.str (), oss.str ().c_str (), oss.str ().length ());	
-    }
     if (outputIg_)
     {      
       std::stringstream eoss;
@@ -353,33 +322,6 @@ ISpyService::registry (void)
 
 void
 ISpyService::produceEvent(const edm::Event& event, const std::string & name, const char *data, long int length)
-{
-  if(netEvents_.size() > bufferSize_)
-  {	    
-    netProducer_->lock();
-    for(std::deque<std::string>::iterator it = netEvents_.begin(), itEnd = netEvents_.end();
-	it != itEnd; ++it)
-    {
-      netProducer_->removeLocalObject(*it);	    
-      netEvents_.pop_front();
-    }    
-    netProducer_->unlock();
-    netProducer_->sendLocalChanges();
-  }
-
-  IgNet::Object o;
-  o.version = Time::current().ns();
-  o.flags = IgNet::VIS_FLAG_NEW | IgNet::VIS_FLAG_SCALAR;
-  o.name = name;
-  o.rawdata.resize(length);
-  memcpy(&o.rawdata[0], &data[0], length);
-  o.lastreq = 0;
-  netEvents_.push_back(name);
-  
-  netProducer_->lock();
-  netProducer_->updateLocalObject(o);
-  netProducer_->unlock();
-  netProducer_->sendLocalChanges();
-}
+{}
 
 DEFINE_FWK_SERVICE(ISpyService);

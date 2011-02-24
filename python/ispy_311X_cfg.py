@@ -19,9 +19,7 @@ process.add_(
     outputFileName = cms.untracked.string('RelValZMM.ig'),
     outputIg = cms.untracked.bool(True),
     outputMaxEvents = cms.untracked.int32(10),
-    online = cms.untracked.bool(False),
     debug = cms.untracked.bool(False)
-
     )
 )
 
