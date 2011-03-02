@@ -1,17 +1,8 @@
 #ifndef ANALYZER_ISPY_SERVICE_H
-# define ANALYZER_ISPY_SERVICE_H
+#define ANALYZER_ISPY_SERVICE_H
 
-# include <deque>
-# include <string>
-
-#include "classlib/utils/Time.h"
-
-namespace lat 
-{
-  class OutputStream;
-  class ZipArchive;
-  class ZipMember;
-}
+#include <string>
+#include <ISpy/Services/interface/zip.h>
 
 class IgDataStorage;
 
@@ -33,42 +24,32 @@ namespace edm {
       void 		postEndJob (void);
       void 		preEventProcessing (const edm::EventID&, const edm::Timestamp&);
       void 		postEventProcessing (const edm::Event&, const edm::EventSetup&);
-      long int		write (const char *data, lat::OutputStream *to, long int maxSize);
+
+      void              write(IgDataStorage* storage); 
       IgDataStorage * 	storage (void) { return storages_[0]; }
       IgDataStorage * 	esStorage (void) { return storages_[1]; }
       void		error (const std::string & what);
 
     private:
-      void		init (void);
-      lat::ZipArchive *	archive (const std::string & name);
-      void		report (void);
-      void		registry (void);
-      void		produceEvent (const edm::Event & event, const std::string & name, const char *data, long int length);
-      std::string	tempFileName (const std::string & name);
-      void		finalize (const std::string & name);
+      void		init(void);
+      void              archive(const std::string& name, zipFile& zf); 
+      void		finalize(void);
 	    
       const std::string outputFileName_;
       const std::string outputESFileName_;
-      const std::string tmpExt_;
-      const std::string ext_;
+
       int		outputMaxEvents_;
-      int		outputMaxTime_;
-      bool		outputIg_;
-      bool		outputReport_;	    
-      bool		outputRegistry_;	    
+    
       int		eventCounter_;	    
       int		fileCounter_;	    
       int		currentRun_;	    
       int		currentEvent_;
-      lat::Time		nextTime_;
-      bool		debug_;
-	    
-      lat::ZipArchive 	*archives_[2];
-      lat::ZipMember	*current_[2];
-      lat::OutputStream	*output_[2];
+      
+      zipFile           zipFile0; // Events
+      zipFile           zipFile1; // Geometry
       IgDataStorage 	*storages_[2];
       std::string	currentFile_[2];	    
-      unsigned int	bufferSize_;
+      int               ziperr_;
     };
   }
 }
