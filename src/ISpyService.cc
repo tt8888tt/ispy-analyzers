@@ -98,7 +98,7 @@ ISpyService::postEventProcessing(const edm::Event& event, const edm::EventSetup&
     
     ziperr_ = zipOpenNewFileInZip64(zipFile0, eoss.str().c_str(), &zi,
                                     NULL, 0, NULL, 0, NULL, // other stuff
-                                    0, // compression method
+                                    Z_DEFLATED, // method
                                     9, // compression level
                                     0);
     assert(ziperr_ == ZIP_OK);
