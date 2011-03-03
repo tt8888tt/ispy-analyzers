@@ -25,30 +25,31 @@ namespace edm {
       void 		preEventProcessing (const edm::EventID&, const edm::Timestamp&);
       void 		postEventProcessing (const edm::Event&, const edm::EventSetup&);
 
-      void              write(IgDataStorage* storage); 
       IgDataStorage * 	storage (void) { return storages_[0]; }
       IgDataStorage * 	esStorage (void) { return storages_[1]; }
       void		error (const std::string & what);
 
     private:
-      void		init(void);
-      void              archive(const std::string& name, zipFile& zf); 
-      void		finalize(void);
+      void              open(const std::string& name, zipFile& zfile);
+      void              write(IgDataStorage* storage, zipFile& zfile);
+      void              close(zipFile& zfile);
 	    
-      const std::string outputFileName_;
-      const std::string outputESFileName_;
+      std::string       outputFileName_;
+      std::string       outputESFileName_;
+      std::string       fileExt_;
+      std::string       currentExt_;
 
       int		outputMaxEvents_;
-    
       int		eventCounter_;	    
       int		fileCounter_;	    
       int		currentRun_;	    
       int		currentEvent_;
       
-      zipFile           zipFile0; // Events
-      zipFile           zipFile1; // Geometry
+      zipFile           zipFile0_; // Events
+      zipFile           zipFile1_; // Geometry
       IgDataStorage 	*storages_[2];
-      std::string	currentFile_[2];	    
+
+      bool              fileWritten_;
       int               ziperr_;
     };
   }
