@@ -79,7 +79,7 @@ ISpyRPCRecHit::analyze( const edm::Event& event, const edm::EventSetup& eventSet
     IgProperty W2 = recHits.addProperty("w2", IgV3d());
 
     IgProperty REGION = recHits.addProperty("region", int(0));
-    //IgProperty RING = recHits.addProperty("ring", int(0));
+    IgProperty RING = recHits.addProperty("ring", int(0));
     IgProperty STATION = recHits.addProperty("station", int(0));
     IgProperty SECTOR = recHits.addProperty("sector", int(0));
     IgProperty LAYER = recHits.addProperty("layer", int(0));
@@ -121,6 +121,7 @@ ISpyRPCRecHit::analyze( const edm::Event& event, const edm::EventSetup& eventSet
       irechit[W2] = IgV3d(gp.x()/100.0, gp.y()/100.0, gp.z()/100.0);    
 
       irechit[DETID] = static_cast<int>((*it).rpcId().rawId());
+      irechit[RING] = static_cast<int>((*it).rpcId().ring());
       irechit[REGION] = static_cast<int>((*it).rpcId().region());
       irechit[STATION] = static_cast<int>((*it).rpcId().station());
       irechit[SECTOR] = static_cast<int>((*it).rpcId().sector());
